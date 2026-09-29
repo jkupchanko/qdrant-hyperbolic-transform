@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qdrant-hyperbolic-transform"
+version = "0.1.0"
+description = "Index deep hyperbolic (Poincare-ball) embeddings in Qdrant using ordinary HNSW"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = ["numpy>=1.24", "qdrant-client>=1.9"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["hyperbolic_qdrant*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

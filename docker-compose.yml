@@ -1,0 +1,13 @@
+# A real Qdrant, so the benchmark measures an actual HNSW graph.
+# In-memory Qdrant does not build one, and the transform's whole claim is about
+# graph construction.
+#
+#   docker compose up -d
+#   python examples/product_taxonomy.py --url http://localhost:6333
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.19.1   # pinned: every number in the README is
+                               # version-dependent
+    ports:
+      - "6333:6333"
+      - "6334:6334"
