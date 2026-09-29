@@ -30,6 +30,7 @@ from hyperbolic_qdrant import benchmark  # noqa: E402
 DIM = 5
 N = 6000
 DEPTHS = (2.0, 3.0, 3.5, 5.0, 6.5, 8.0)
+EFS = (16, 64, 256)   # hnsw_ef, the knob that costs work
 
 
 def hierarchical_corpus(n: int = N, dim: int = DIM, branch: int = 4,
@@ -82,9 +83,9 @@ def main() -> None:
     ap.add_argument("--queries", type=int, default=100)
     ap.add_argument("--builds", type=int, default=3,
                     help="rebuilds per arm; the spread becomes the noise floor")
-    ap.add_argument("--width", type=int, default=10,
-                    help="prefetch width to report. The transform's advantage is "
-                         "at NARROW width; by w=100 plain Euclid catches up.")
+    ap.add_argument("--ef", type=int, default=256, choices=EFS,
+                    help="which swept hnsw_ef to report in the table. ef is the "
+                         "knob that costs work, so arms are compared at matched ef.")
     ap.add_argument("--api-key", default=None,
                     help="API key for a managed Qdrant. Also read from QDRANT_API_KEY.")
     ap.add_argument("--allow-brute", action="store_true",
@@ -92,17 +93,18 @@ def main() -> None:
                          "flatter the transform; see the README.")
     args = ap.parse_args()
 
-    W = args.width
+    W = args.ef
     u, frac = hierarchical_corpus()
     client = _client(args) if args.url else None
     mode = None
 
+    print("all arms at hnsw_ef=%d, limit=10, %d builds each\n" % (W, args.builds))
     print("%-8s %10s %10s %12s %10s %9s" % (
         "a_med", "euclid", "cosine", "transform", "gain", "noise"))
     print("-" * 64)
     for target in DEPTHS:
         X = at_depth(u, frac, target)
-        res = benchmark(X, n_queries=args.queries, widths=(16, 64, 256), seed=0,
+        res = benchmark(X, n_queries=args.queries, widths=EFS, seed=0,
                         client=client, builds=args.builds)
         mode = res.mode
         if mode != "hnsw" and not args.allow_brute:

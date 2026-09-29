@@ -55,7 +55,7 @@ jobs:
       - name: depth ladder
         run: |
           python examples/depth_ladder.py \
-            --url http://localhost:6333 --queries 60 --builds 3 --width 10 \
+            --url http://localhost:6333 --queries 60 --builds 3 --ef 256 \
             | tee ladder.txt
           grep -q "HNSW graph confirmed" ladder.txt \
             || { echo "::error::no HNSW graph was built; numbers are meaningless"; exit 1; }
