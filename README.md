@@ -1,5 +1,7 @@
 # qdrant-hyperbolic-transform
 
+[![tests and benchmark](https://github.com/jkupchanko/qdrant-hyperbolic-transform/actions/workflows/benchmark.yml/badge.svg)](https://github.com/jkupchanko/qdrant-hyperbolic-transform/actions/workflows/benchmark.yml)
+
 Index deep hyperbolic (Poincaré-ball) embeddings in Qdrant using ordinary HNSW.
 
 This is a preprocessing layer, not a Qdrant change. You convert your vectors, create
@@ -180,6 +182,15 @@ a minute and reports a noise floor.
   another of the same corpus. Use more builds if a gap is close to the floor.
 - The results on trained WordNet and Google Product Taxonomy embeddings predate the
   quantile fix and are not reproduced here.
+
+## Don't take these numbers on trust
+
+Every table below is regenerated on each push by
+[CI](https://github.com/jkupchanko/qdrant-hyperbolic-transform/actions/workflows/benchmark.yml),
+against a real Qdrant service container on infrastructure the author does not
+control. The run fails if no HNSW graph was built or if no noise floor was
+reported, so a green run with a table in it is itself the evidence. Open the latest
+run and read the job summary.
 
 ## Install
 
