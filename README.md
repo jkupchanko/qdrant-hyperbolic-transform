@@ -16,7 +16,7 @@ recall ceiling that more search cannot fix. The transform does not.
 ## The problem
 
 Train a Poincaré embedding on a deep hierarchy and almost every point ends up at norm
-0.9999 — crushed into a shell one ten-thousandth thick against the boundary of the
+0.9999, crushed into a shell one ten-thousandth thick against the boundary of the
 ball. Store those coordinates directly and HNSW's construction distance is
 
 ```
@@ -28,8 +28,8 @@ parent→child, and search has no edges to descend.
 
 ## The transform
 
-For a Poincaré point `v`, let `w = 1/(1 - ||v||²)`. Minimising the geodesic distance
-to a query `u` is equivalent to minimising
+For a Poincaré point `v`, let `w = 1/(1 - ||v||²)`. Minimizing the geodesic distance
+to a query `u` is equivalent to minimizing
 
 ```
 document:  phi(v) = [w, w·v]           scaled by a quantile, padded to unit norm
@@ -41,21 +41,21 @@ distance:  Dot
 index and HNSW can navigate.
 
 **The stored dimension is `d + 2`, and that is not free.** On the 5-dimensional
-corpora here that is 7d against 5d — **40% more** per distance computation and per
+corpora here that is 7d against 5d, or **40% more** per distance computation and per
 stored vector. At 512 dimensions the same two coordinates are 0.4% and irrelevant.
 The benchmark prints this overhead alongside the recall so you can net it yourself;
 none of the recall numbers below are adjusted for it.
 
 **Two things that are not optional:**
 
-- **The minus sign.** The maths minimises the inner product and Qdrant's `Dot`
-  maximises, so the query is negated. Getting it wrong gives recall **0.0000**, not a
+- **The minus sign.** The math minimizes the inner product and Qdrant's `Dot`
+  maximizes, so the query is negated. Getting it wrong gives recall **0.0000**, not a
   degraded result. Pinned by a test.
 - **Quantile scaling, not max.** Scaling by the largest document norm lets a single
   anomalously deep point set the scale for the whole corpus, crushing everything else
   onto the pad axis where HNSW cannot tell documents apart. Measured: **0.0025** under
   max-scaling, **0.9988** at quantile 0.99, on the same corpus. Check
-  `transform.clipped_fraction(docs)` — documents above the quantile are ranked
+  `transform.clipped_fraction(docs)`. Documents above the quantile are ranked
   approximately rather than exactly.
 
 ## Usage
@@ -87,7 +87,7 @@ python examples/depth_ladder.py     --url http://localhost:6333
 python examples/product_taxonomy.py --url http://localhost:6333
 ```
 
-`QdrantClient(":memory:")` builds no graph at all — `indexed_vectors_count` stays 0.
+`QdrantClient(":memory:")` builds no graph at all, and `indexed_vectors_count` stays 0.
 **Without `--url` the scripts refuse to print a results table.** Under brute force the
 transform is exact by construction and scores 1.0000 everywhere, which *flatters* it.
 A number nobody should quote is worse than no number. `--allow-brute` overrides.
@@ -124,7 +124,7 @@ fixed. Product-taxonomy demo, three builds per arm, live server:
 | Cosine | 0.4650 ±0.000 | 0.4650 ±0.000 | **0.4650 ±0.000** |
 | **transform** | 0.5646 ±0.101 | 0.6725 ±0.132 | **0.8550 ±0.116** |
 
-**Euclid is flat.** Spending 16× more search changes nothing, because the neighbours
+**Euclid is flat.** Spending 16× more search changes nothing, because the neighbors
 it needs are not in its graph at any ef. The transform climbs 0.56 → 0.86 with the
 same budget.
 
@@ -156,7 +156,7 @@ against ±0.000). That is a real cost and the harness flags it.
 ## When **not** to use this
 
 **Hyperbolic CLIP models.** Off-the-shelf models like Hyper3-CLIP, MERU and HyCoCLIP
-sit at `a_med` ≈ 0.009 — their points are near the origin where hyperbolic space is
+sit at `a_med` ≈ 0.009, because their points are near the origin where hyperbolic space is
 effectively flat, and the exact geodesic, Euclid and cosine produce **bit-identical**
 rankings on them. Use `Distance.EUCLID` on the raw coordinates.
 
@@ -205,7 +205,7 @@ docker compose up -d        # a real Qdrant, needed for every number above
 | path | what |
 |---|---|
 | `hyperbolic_qdrant/transform.py` | the document and query transforms, and the derivation |
-| `hyperbolic_qdrant/depth.py` | `measure_depth()` — reports `a_med` and what to expect |
+| `hyperbolic_qdrant/depth.py` | `measure_depth()`, which reports `a_med` and what to expect |
 | `hyperbolic_qdrant/index.py` | create the Dot collection and upload |
 | `hyperbolic_qdrant/search.py` | transform a query, call Qdrant normally |
 | `hyperbolic_qdrant/benchmark.py` | three arms, replicate builds, controls, noise floor |
