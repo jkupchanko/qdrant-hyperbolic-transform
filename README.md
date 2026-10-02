@@ -177,25 +177,27 @@ against exact geodesic truth, recall@10:
 
 | corpus | arm | B/pt | ef=64 | ef=256 | ef=2048 |
 | --- | --- | ---: | ----: | -----: | ------: |
-| `a_med` 3.5 | raw Poincaré, Euclid | 20 | 0.573 | 0.573 | 0.573 |
-| `a_med` 3.5 | **transform, Dot** | 28 | **0.790** | **0.909** | 0.905 |
-| `a_med` 7.75 | raw Poincaré, Euclid | 20 | 0.131 | 0.131 | 0.131 |
-| `a_med` 7.75 | transform, Dot | 28 | 0.172 | 0.489 | **0.579** |
+| `a_med` 3.5 | raw Poincaré, Euclid | 20 | 0.5733 | 0.5733 | 0.5733 |
+| `a_med` 3.5 | **transform, Dot** | 28 | **0.7853** | **0.9067** | 0.9056 |
+| `a_med` 7.75 | raw Poincaré, Euclid | 20 | 0.1307 | 0.1307 | 0.1307 |
+| `a_med` 7.75 | transform, Dot | 28 | 0.1722 | 0.3776 | 0.5622 |
 
-**The raw arm is flat in `ef` to five decimals**, across a 32x increase in
-search effort. That is the problem stated as plainly as it gets: the graph has
-no edges toward the right neighbors, and widening the beam cannot create them.
-The transform's curve climbs the way a working index should.
+Three builds per arm, twelve in all. Worst build-to-build spread `0.0447`, so
+the `+0.33` at `a_med` 3.5 is roughly seven times the noise floor.
 
-**At `a_med` 7.75 the transform is a rescue, not a fix.** 0.579 beats 0.131 by
-a distance and is still not recall you would ship. If your corpus is that
-crowded, this alone is not enough.
+**The raw arm is flat in `ef`, and identical to four decimals across three
+independent builds.** That is not a flaky index, it is a ceiling. Measured
+offline with no index at all, exact Euclid over these coordinates recovers
+`0.721` of the geodesic top-10 at `a_med` 3.5 and `0.155` at 7.75. The graph
+is matching exact search; `ef` cannot climb past what exact already returns.
 
-**One caveat on the raw arm.** Its graph-vs-brute gate returned 1.0 on both
-corpora: exact search and `ef=64` gave the same ten points. That fits a graph
-degenerate enough to return the same wrong answer either way, which is
-consistent with the flatness, but it does not rule out that arm being served
-by a scan. The script now warns when a gate returns 1.0.
+So the transform is not beating a weak graph. It beats what Euclid can reach
+**at all** on raw Poincaré coordinates: `0.907` against a hard ceiling of
+`0.721`.
+
+**At `a_med` 7.75 the transform is a rescue, not a fix.** `0.5622` beats
+`0.1307` by a distance and is still not recall you would ship. If your corpus
+is that crowded, this alone is not enough.
 
 ## Honest limits
 
